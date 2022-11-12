@@ -1,0 +1,35 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=root
+      - POSTGRES_DB=django
+    networks:
+      - isolation-network
+  
+  web:
+    build: .
+    command: sh scripts/entrypoint.sh
+    tty: true
+    volumes:
+      - ./:/app
+    ports:
+      - 5000:5000
+    env_file:
+      - .env.example
+    environment:
+      - LOCAL_ENTRYPOINT=True
+    depends_on:
+      - db
+    networks:
+      - isolation-network
+
+networks:
+  isolation-network:
+    driver: bridge
