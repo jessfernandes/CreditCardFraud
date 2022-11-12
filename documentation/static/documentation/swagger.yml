@@ -1,0 +1,441 @@
+
+openapi: 3.0.2
+info:
+  title: 'Credit Card Fraud - Classification'
+  version: '1.0'
+tags:
+  - name: Authentication
+    description: Endpoints to authenticate users.
+  - name: User
+    description: Endpoints to read, and update the user.
+  - name: Samples Management
+    description: Endpoints to manipulate samples.
+
+paths:
+  /api/authentication/login/:
+    post:
+      operationId: createlogin
+      description: Logs a user in.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginOutput"
+          description: 'Success authentication response'
+      tags:
+      - Authentication
+      security:
+        - bearerAuth: []
+
+  /api/authentication/renovate/:
+    post:
+      operationId: createrenovate
+      description: Renovates the access token of a user.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RenovateInput"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RenovateOutput"
+          description: 'Token renovation success response'
+      tags:
+      - Authentication
+      security:
+        - bearerAuth: []
+
+  /api/user/:
+    get:
+      operationId: listUsers
+      description: List user information.
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+          description: 'Success response with user information'
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+    put:
+      operationId: updateUserResource
+      description: Updates a specific user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateInput"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MsgOutput"
+          description: 'Success response with the updated information of the user'
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+
+  /api/samples/:
+    post:
+      operationId: sampleClassify
+      description: Classify new sample based on the previous trained model and input data.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassificationInput"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClassificationOutput"
+          description: 'Token renovation success response'
+      tags:
+      - Samples Management
+      security:
+        - bearerAuth: []
+    get:
+      operationId: classificationList
+      description: Gets all data related to predictions.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllData"
+          description: 'Success response with the respective data'
+      tags:
+        - Samples Management
+      security:
+        - bearerAuth: [ ]
+    delete:
+      operationId: deleteSample
+      description: Delete and specific register from database based on ID.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SampleID"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MsgOutput"
+          description: 'Success response with the deleted information'
+      tags:
+        - Samples Management
+      security:
+        - bearerAuth: []
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginInput:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: User username
+        password:
+          type: string
+          description: Password
+    
+    LoginOutput:
+      type: object
+      properties:
+        tk_renovation:
+          type: string
+          description: JWT Renovation Token
+        tk_access:
+          type: string
+          description: JWT Access Token
+
+    RenovateInput:
+      required:
+        - tk_renovation
+      type: object
+      properties:
+        tk_renovation:
+          type: string
+          description: JWT Renovation Token
+    
+    RenovateOutput:
+      required:
+        - tk_acccess
+      type: object
+      properties:
+        tk_acccess:
+          type: string
+          description: JWT Renovation Access Token
+    
+    UserInput:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          description: User username
+        email:
+          type: string
+          description: Email of the user
+        password:
+          type: string
+          description: Password
+    
+    UserUpdateInput:
+      type: object
+      required:
+        - username
+        - email
+        - password
+        - confirm_password
+      properties:
+        username:
+          type: string
+          description: User username
+        email:
+          type: string
+          description: Email of the user
+        password:
+          type: string
+          description: Password
+        confirm_password:
+          type: string
+          description: Password confirmation
+    
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: User identifier
+        username:
+          type: string
+          description: User username
+        email:
+          type: string
+          description: Email of the user
+        date_joined:
+          type: string
+          description: Timestamp of user creation date
+
+    AllData:
+      type: array
+      items:
+        $ref: '#/components/schemas/ClassificationOutput'
+
+    SampleID:
+      type: object
+      required:
+        - ID
+      properties:
+        id:
+          type: integer
+          description: ID that must be deleted
+
+    ClassificationInput:
+      required:
+        - V1
+        - V2
+        - V3
+        - V4
+        - V5
+        - V6
+        - V7
+        - V8
+        - V9
+        - V10
+        - V11
+        - V12
+        - V13
+        - V14
+        - V15
+        - V16
+        - V17
+        - V18
+        - V19
+        - V20
+        - V21
+        - V22
+        - V23
+        - V24
+        - V25
+        - V26
+        - V27
+        - V28
+        - Amount
+      type: object
+      properties:
+        V1:
+          type: float
+          example: -1.815522427443
+          description: feature value from V1
+        V2:
+          type: float
+          example: -0.0727811733098497
+          description: feature value from V2
+        V3:
+          type: float
+          example: 1.37815522427443
+          description: feature value from V3
+        V4:
+          type: float
+          example: -0.338320769942518
+          description: feature value from V4
+        V5:
+          type: float
+          example: 0.462387777762292
+          description: feature value from V5
+        V6:
+          type: float
+          example: 0.239598554061257
+          description: feature value from V6
+        V7:
+          type: float
+          example: 0.0986979012610507
+          description: feature value from V7
+        V8:
+          type: float
+          example: 0.363786969611213
+          description: feature value from V8
+        V9:
+          type: float
+          example: 0.0907941719789316
+          description: feature value from V9
+        V10:
+          type: float
+          example: -0.551599533260813
+          description: feature value from V10
+        V11:
+          type: float
+          example: -0.617800855762348
+          description: feature value from V11
+        V12:
+          type: float
+          example: -0.991389847235408
+          description: feature value from V12
+        V13:
+          type: float
+          example: -0.311169353699879
+          description: feature value from V13
+        V14:
+          type: float
+          example: 1.46817697209427
+          description: feature value from V14
+        V15:
+          type: float
+          example: -0.470400525259478
+          description: feature value from V15
+        V16:
+          type: float
+          example: 0.207971241929242
+          description: feature value from V16
+        V17:
+          type: float
+          example: 0.0257905801985591
+          description: feature value from V17
+        V18:
+          type: float
+          example: 0.403992960255733
+          description: feature value from V18
+        V19:
+          type: float
+          example: 0.251412098239705
+          description: feature value from V19
+        V20:
+          type: float
+          example: -0.018306777944153
+          description: feature value from V20
+        V21:
+          type: float
+          example: 0.815522427443
+          description: feature value from V21
+        V22:
+          type: float
+          example: 0.277837575558899
+          description: feature value from V22
+        V23:
+          type: float
+          example: -0.110473910188767
+          description: feature value from V23
+        V24:
+          type: float
+          example: 0.0669280749146731
+          description: feature value from V24
+        V25:
+          type: float
+          example: 0.128539358273528
+          description: feature value from V25
+        V26:
+          type: float
+          example: -0.189114843888824
+          description: feature value from V26
+        V27:
+          type: float
+          example: 0.133558376740387
+          description: feature value from V27
+        V28:
+          type: float
+          example: -0.0210530534538215
+          description: feature value from V28
+        Amount:
+          type: float
+          example: 149.62
+          description: feature value from amount transaction
+ 
+    ClassificationOutput:
+      type: object
+      description: "Array containing the details of the classification process"
+      properties:
+        id: 
+          type: integer
+          description: "ID registered in the database"
+          example: 1
+        class:
+          type: integer
+          description: "The predicted class from the model."
+          example: 0
+        probability:
+          type: array
+          description: "Probability of each class from predicted sample."
+          example: [0.85,0.15]
+
+    MsgOutput:
+      required:
+        - msg
+      type: object
+      properties:
+        msg:
+          type: string
+          description: Message contains the return of the system.
