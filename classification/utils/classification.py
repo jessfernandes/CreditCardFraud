@@ -1,24 +1,23 @@
 from core.messages import CoreMessage
 from classification.models import predict, features
 from typing import NoReturn
+import pandas as pd
+import pickle
 
 class Classification(object):
     def __init__(self,data):
         self._error = 0
+        self._pkl_filename = "/app/classification/utils/randomforest.pkl"
         self.data = data
 
         if self._error == 0:
             self.__process()
         
     def fit(self):
-        try:
-            if self._error == 0:
-                return self._data_response, self._error
-            else:
-                return self._msg, self._error
-        except Exception as e:
-            self._logError += "Error (data):" + str(e)
-            self.__ErroLog()
+        if self._error == 0:
+            return self._data_response, self._error
+        else:
+            return self._msg, self._error
 
     @property
     def data(self) -> str:
@@ -35,6 +34,11 @@ class Classification(object):
 
     def __process(self):
         try:
+            with open(self._pkl_filename, 'rb') as file:
+                self._model = pickle.load(file)
+            data = pd.DataFrame([self._data])
+            self._pred_class = self._model.predict(data)[0]
+            self._prob_class = self._model.predict_proba(data)[0].tolist()
             self.__input_data()
         except Exception:
             self._msg, self._error = CoreMessage().server_error, 1
@@ -76,8 +80,8 @@ class Classification(object):
 
             pred_db = predict()
             pred_db.model = "Random Forest"
-            pred_db.class_predicted = 0
-            pred_db.probability = [0.1,0.9]
+            pred_db.class_predicted = self._pred_class
+            pred_db.probability = self._prob_class
             pred_db.featuresid = feat_db
             pred_db.save()
 
@@ -87,5 +91,5 @@ class Classification(object):
                                     "probability": pred_db.probability
                                     }
 
-        except Exception as e:
+        except Exception:
             self._msg, self._error = CoreMessage().server_error, 1

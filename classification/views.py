@@ -16,7 +16,7 @@ class ClassificationView(APIView):
         """Gets list of all predictions in the database."""
         try:
 
-            data = predict.objects.all().extra(select={'id':'id','class':'class_predicted','probability':'probability'}).values('id','class_predicted','probability')
+            data = predict.objects.all().extra(select={'id':'id','class':'class_predicted','probability':'probability'}).values('id','class','probability')
             if data:
                 return response(data, status.HTTP_200_OK)
             else:
