@@ -8,6 +8,7 @@ class Classification(object):
     def __init__(self,data):
         self._error = 0
         self._pkl_filename = "/app/classification/utils/randomforest.pkl"
+        self._pkl_scaler = "/app/classification/utils/scaler.sav"
         self.data = data
 
         if self._error == 0:
@@ -36,7 +37,9 @@ class Classification(object):
         try:
             with open(self._pkl_filename, 'rb') as file:
                 self._model = pickle.load(file)
-            data = pd.DataFrame([self._data])
+            with open(self._pkl_scaler, 'rb') as file:
+                self._scaler = pickle.load(file)
+            data = self._scaler.transform(pd.DataFrame([self._data]))
             self._pred_class = self._model.predict(data)[0]
             self._prob_class = self._model.predict_proba(data)[0].tolist()
             self.__input_data()
